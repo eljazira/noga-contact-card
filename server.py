@@ -149,7 +149,7 @@ class Handler(BaseHTTPRequestHandler):
             values = (
                 record_id, datetime.now(timezone.utc).isoformat(timespec="seconds"),
                 safe_text(payload["firstName"]), safe_text(payload["lastName"]), safe_text(payload["birthDate"], 20),
-                "צהובה" if payload["group"] == "yellow" else "כחולה", safe_text(payload["address"], 300),
+                "צהובים" if payload["group"] == "yellow" else "כחולים", safe_text(payload["address"], 300),
                 safe_text(payload["parent1"]), safe_text(payload["phone1"], 40), safe_text(payload["parent2"]),
                 safe_text(payload["phone2"], 40), f"photos/{photo_name}"
             )
