@@ -27,7 +27,7 @@
 </head>
 <body>
   <main class="wrap">
-    <header><h1>כרטיס קשר לגן 🌈</h1><p>ממלאים, יוצרים כרטיס ושולחים לקבוצה.<br>הפרטים והתמונה לא נשמרים באתר.</p></header>
+    <header><h1>כרטיס קשר לגן 🌈</h1><p>ממלאים פעם אחת והפרטים נשמרים במאגר דף הקשר.<br>בסיום אפשר גם להוריד כרטיס תמונה.</p></header>
     <section class="panel">
       <form id="contactForm">
         <div class="row">
@@ -49,9 +49,9 @@
           <div class="field"><label for="phone2">טלפון, הורה 2</label><input id="phone2" type="tel" inputmode="tel" required autocomplete="tel"></div>
         </div>
         <div class="error" id="error"></div>
-        <div class="actions"><button class="primary" type="submit">יצירת כרטיס</button><button class="secondary" type="reset">ניקוי</button></div>
+        <div class="actions"><button class="primary" type="submit">שמירת הפרטים</button><button class="secondary" type="reset">ניקוי</button></div>
       </form>
-      <p class="privacy">🔒 הכול קורה במכשיר שלך. האתר לא שולח ולא שומר מידע.</p>
+      <p class="privacy">🔒 הפרטים נשמרים במאגר פרטי ומאובטח לצורך דף הקשר של הגן בלבד.</p>
       <section id="result" aria-live="polite">
         <article class="card" id="card">
           <div class="card-head"><img class="avatar" id="avatar" alt=""><div class="kid"><h2 id="kidName"></h2><span class="badge" id="groupBadge"></span></div></div>
@@ -70,9 +70,10 @@
   </main>
   <canvas id="canvas" width="1080" height="1350"></canvas>
   <script>
+    if(location.hostname.endsWith('github.io')) fetch('backend-url.json?'+Date.now()).then(r=>r.json()).then(x=>{if(x.url)location.replace(x.url)}).catch(()=>{});
     const $=id=>document.getElementById(id), form=$('contactForm'), result=$('result'), card=$('card'); let photoData='';
     $('photo').addEventListener('change',e=>{const f=e.target.files[0]; if(!f)return; if(f.size>12*1024*1024){$('error').textContent='התמונה גדולה מדי. עד 12MB';e.target.value='';return} const r=new FileReader();r.onload=()=>photoData=r.result;r.readAsDataURL(f)});
-    form.addEventListener('submit',e=>{e.preventDefault();$('error').textContent='';if(!photoData){$('error').textContent='צריך לבחור תמונה';return} const group=$('group').value; $('avatar').src=photoData;$('kidName').textContent=`${$('firstName').value.trim()} ${$('lastName').value.trim()}`;$('groupBadge').textContent=`קבוצה ${group==='yellow'?'צהובה':'כחולה'}`;card.classList.toggle('blue',group==='blue');$('outBirth').textContent=new Date($('birthDate').value+'T12:00:00').toLocaleDateString('he-IL');$('outAddress').textContent=$('address').value.trim();$('outParent1').textContent=$('parent1').value.trim();$('outPhone1').textContent=$('phone1').value.trim();$('outParent2').textContent=$('parent2').value.trim();$('outPhone2').textContent=$('phone2').value.trim();result.style.display='block';form.style.display='none';result.scrollIntoView({behavior:'smooth'})});
+    form.addEventListener('submit',async e=>{e.preventDefault();$('error').textContent='';if(!photoData){$('error').textContent='צריך לבחור תמונה';return}const button=form.querySelector('button[type=submit]');button.disabled=true;button.textContent='שומרת...';const payload={firstName:$('firstName').value.trim(),lastName:$('lastName').value.trim(),birthDate:$('birthDate').value,group:$('group').value,address:$('address').value.trim(),parent1:$('parent1').value.trim(),phone1:$('phone1').value.trim(),parent2:$('parent2').value.trim(),phone2:$('phone2').value.trim(),photo:photoData};try{const response=await fetch('/submit',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});if(!response.ok)throw new Error();const group=payload.group;$('avatar').src=photoData;$('kidName').textContent=`${payload.firstName} ${payload.lastName}`;$('groupBadge').textContent=`קבוצה ${group==='yellow'?'צהובה':'כחולה'}`;card.classList.toggle('blue',group==='blue');$('outBirth').textContent=new Date(payload.birthDate+'T12:00:00').toLocaleDateString('he-IL');$('outAddress').textContent=payload.address;$('outParent1').textContent=payload.parent1;$('outPhone1').textContent=payload.phone1;$('outParent2').textContent=payload.parent2;$('outPhone2').textContent=payload.phone2;result.style.display='block';form.style.display='none';result.scrollIntoView({behavior:'smooth'})}catch(err){$('error').textContent='השמירה לא הצליחה. נסו שוב בעוד רגע'}finally{button.disabled=false;button.textContent='שמירת הפרטים'}});
     form.addEventListener('reset',()=>{photoData='';$('error').textContent=''});$('edit').onclick=()=>{result.style.display='none';form.style.display='grid';scrollTo({top:0,behavior:'smooth'})};
     function roundRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill()}
     function fitText(ctx,text,maxWidth,start){let size=start;do{ctx.font=`700 ${size}px Arial`;if(ctx.measureText(text).width<=maxWidth)return size;size-=2}while(size>28);return size}
