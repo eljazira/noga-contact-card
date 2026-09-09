@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#fff7dd">
+  <title>כרטיס קשר לגן</title>
+  <style>
+    :root{--ink:#23332d;--muted:#68746f;--paper:#fffdf7;--line:#dfded7;--yellow:#ffd84d;--blue:#66b5ff;--green:#2e765a}
+    *{box-sizing:border-box} body{margin:0;background:linear-gradient(160deg,#fff8d9,#eaf7ff);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;min-height:100vh}
+    .wrap{width:min(680px,100%);margin:auto;padding:24px 16px 48px}
+    header{text-align:center;margin:8px 0 24px} h1{margin:0 0 8px;font-size:clamp(28px,8vw,42px)} header p{margin:0;color:var(--muted);line-height:1.5}
+    .panel{background:rgba(255,255,255,.9);border:1px solid rgba(255,255,255,.8);border-radius:24px;padding:20px;box-shadow:0 18px 45px rgba(55,73,65,.12);backdrop-filter:blur(12px)}
+    form{display:grid;gap:16px}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{display:grid;gap:7px}label{font-weight:700;font-size:15px}
+    input,select{width:100%;font:inherit;color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:13px;padding:13px 14px;outline:none}input:focus,select:focus{border-color:var(--green);box-shadow:0 0 0 3px rgba(46,118,90,.12)}
+    input[type=file]{padding:10px}.hint{font-size:12px;color:var(--muted);font-weight:400}
+    button{border:0;border-radius:14px;padding:14px 18px;font:700 17px inherit;cursor:pointer}.primary{background:var(--green);color:white}.secondary{background:#edf3f0;color:var(--ink)}
+    .actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}.privacy{text-align:center;font-size:12px;color:var(--muted);margin:16px 0 0}
+    #result{display:none;margin-top:20px}.card{position:relative;overflow:hidden;border-radius:24px;background:var(--paper);border:1px solid var(--line);padding:22px;box-shadow:0 14px 35px rgba(55,73,65,.13)}
+    .card:before{content:"";position:absolute;inset:0 auto 0 0;width:12px;background:var(--yellow)}.card.blue:before{background:var(--blue)}
+    .card-head{display:flex;align-items:center;gap:16px}.avatar{width:108px;height:108px;border-radius:50%;object-fit:cover;background:#edf3f0;border:5px solid white;box-shadow:0 4px 18px rgba(0,0,0,.12)}
+    .kid h2{font-size:28px;margin:0 0 7px}.badge{display:inline-block;background:var(--yellow);border-radius:999px;padding:6px 11px;font-weight:800;font-size:13px}.blue .badge{background:var(--blue)}
+    .details{display:grid;gap:11px;margin-top:20px}.detail{display:grid;grid-template-columns:110px 1fr;gap:8px;border-top:1px solid #eceae3;padding-top:11px}.detail b{color:var(--muted);font-size:14px}.result-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+    canvas{display:none}.error{color:#a73535;font-size:13px;min-height:18px;text-align:center}
+    @media(max-width:520px){.row,.actions,.result-actions{grid-template-columns:1fr}.panel{padding:16px}.card-head{align-items:flex-start}.avatar{width:92px;height:92px}.detail{grid-template-columns:92px 1fr}}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <header><h1>כרטיס קשר לגן 🌈</h1><p>ממלאים, יוצרים כרטיס ושולחים לקבוצה.<br>הפרטים והתמונה לא נשמרים באתר.</p></header>
+    <section class="panel">
+      <form id="contactForm">
+        <div class="row">
+          <div class="field"><label for="firstName">שם הילד/ה</label><input id="firstName" required autocomplete="off"></div>
+          <div class="field"><label for="lastName">שם משפחה</label><input id="lastName" required autocomplete="off"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label for="birthDate">תאריך לידה</label><input id="birthDate" type="date" required></div>
+          <div class="field"><label for="group">קבוצה</label><select id="group" required><option value="">בחירה</option><option value="yellow">צהובה</option><option value="blue">כחולה</option></select></div>
+        </div>
+        <div class="field"><label for="photo">תמונה של הילד/ה <span class="hint">JPG או PNG</span></label><input id="photo" type="file" accept="image/*" required></div>
+        <div class="field"><label for="address">איפה גרים <span class="hint">כתובת או שכונה</span></label><input id="address" required autocomplete="street-address"></div>
+        <div class="row">
+          <div class="field"><label for="parent1">שם מלא, הורה 1</label><input id="parent1" required autocomplete="name"></div>
+          <div class="field"><label for="phone1">טלפון, הורה 1</label><input id="phone1" type="tel" inputmode="tel" required autocomplete="tel"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label for="parent2">שם מלא, הורה 2</label><input id="parent2" required autocomplete="name"></div>
+          <div class="field"><label for="phone2">טלפון, הורה 2</label><input id="phone2" type="tel" inputmode="tel" required autocomplete="tel"></div>
+        </div>
+        <div class="error" id="error"></div>
+        <div class="actions"><button class="primary" type="submit">יצירת כרטיס</button><button class="secondary" type="reset">ניקוי</button></div>
+      </form>
+      <p class="privacy">🔒 הכול קורה במכשיר שלך. האתר לא שולח ולא שומר מידע.</p>
+      <section id="result" aria-live="polite">
+        <article class="card" id="card">
+          <div class="card-head"><img class="avatar" id="avatar" alt=""><div class="kid"><h2 id="kidName"></h2><span class="badge" id="groupBadge"></span></div></div>
+          <div class="details">
+            <div class="detail"><b>תאריך לידה</b><span id="outBirth"></span></div>
+            <div class="detail"><b>גרים ב</b><span id="outAddress"></span></div>
+            <div class="detail"><b>הורה 1</b><span id="outParent1"></span></div>
+            <div class="detail"><b>טלפון</b><span id="outPhone1"></span></div>
+            <div class="detail"><b>הורה 2</b><span id="outParent2"></span></div>
+            <div class="detail"><b>טלפון</b><span id="outPhone2"></span></div>
+          </div>
+        </article>
+        <div class="result-actions"><button class="primary" id="download" type="button">הורדת הכרטיס כתמונה</button><button class="secondary" id="edit" type="button">עריכת הפרטים</button></div>
+      </section>
+    </section>
+  </main>
+  <canvas id="canvas" width="1080" height="1350"></canvas>
+  <script>
+    const $=id=>document.getElementById(id), form=$('contactForm'), result=$('result'), card=$('card'); let photoData='';
+    $('photo').addEventListener('change',e=>{const f=e.target.files[0]; if(!f)return; if(f.size>12*1024*1024){$('error').textContent='התמונה גדולה מדי. עד 12MB';e.target.value='';return} const r=new FileReader();r.onload=()=>photoData=r.result;r.readAsDataURL(f)});
+    form.addEventListener('submit',e=>{e.preventDefault();$('error').textContent='';if(!photoData){$('error').textContent='צריך לבחור תמונה';return} const group=$('group').value; $('avatar').src=photoData;$('kidName').textContent=`${$('firstName').value.trim()} ${$('lastName').value.trim()}`;$('groupBadge').textContent=`קבוצה ${group==='yellow'?'צהובה':'כחולה'}`;card.classList.toggle('blue',group==='blue');$('outBirth').textContent=new Date($('birthDate').value+'T12:00:00').toLocaleDateString('he-IL');$('outAddress').textContent=$('address').value.trim();$('outParent1').textContent=$('parent1').value.trim();$('outPhone1').textContent=$('phone1').value.trim();$('outParent2').textContent=$('parent2').value.trim();$('outPhone2').textContent=$('phone2').value.trim();result.style.display='block';form.style.display='none';result.scrollIntoView({behavior:'smooth'})});
+    form.addEventListener('reset',()=>{photoData='';$('error').textContent=''});$('edit').onclick=()=>{result.style.display='none';form.style.display='grid';scrollTo({top:0,behavior:'smooth'})};
+    function roundRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r);ctx.fill()}
+    function fitText(ctx,text,maxWidth,start){let size=start;do{ctx.font=`700 ${size}px Arial`;if(ctx.measureText(text).width<=maxWidth)return size;size-=2}while(size>28);return size}
+    function loadImage(src){return new Promise((ok,bad)=>{const im=new Image();im.onload=()=>ok(im);im.onerror=bad;im.src=src})}
+    $('download').onclick=async()=>{const c=$('canvas'),x=c.getContext('2d'),group=$('group').value,accent=group==='yellow'?'#ffd84d':'#66b5ff';x.fillStyle='#fffdf7';x.fillRect(0,0,c.width,c.height);x.fillStyle=accent;x.fillRect(0,0,30,c.height);x.direction='rtl';x.textAlign='right';x.fillStyle='#23332d';x.font='700 38px Arial';x.fillText('כרטיס קשר לגן',980,90);const im=await loadImage(photoData);x.save();x.beginPath();x.arc(820,270,150,0,Math.PI*2);x.clip();const s=Math.max(300/im.width,300/im.height),w=im.width*s,h=im.height*s;x.drawImage(im,820-w/2,270-h/2,w,h);x.restore();x.strokeStyle='#fff';x.lineWidth=16;x.beginPath();x.arc(820,270,150,0,Math.PI*2);x.stroke();const name=`${$('firstName').value.trim()} ${$('lastName').value.trim()}`;x.fillStyle='#23332d';fitText(x,name,560,72);x.fillText(name,600,245);x.fillStyle=accent;roundRect(x,330,278,270,64,32);x.fillStyle='#23332d';x.font='700 30px Arial';x.fillText(`קבוצה ${group==='yellow'?'צהובה':'כחולה'}`,575,321);const rows=[['תאריך לידה',$('outBirth').textContent],['גרים ב',$('outAddress').textContent],['הורה 1',$('outParent1').textContent],['טלפון',$('outPhone1').textContent],['הורה 2',$('outParent2').textContent],['טלפון',$('outPhone2').textContent]];let y=535;for(const [label,value] of rows){x.strokeStyle='#e5e2d9';x.lineWidth=2;x.beginPath();x.moveTo(100,y-55);x.lineTo(980,y-55);x.stroke();x.fillStyle='#68746f';x.font='700 27px Arial';x.fillText(label,950,y);x.fillStyle='#23332d';fitText(x,value,620,36);x.fillText(value,700,y);y+=120}x.fillStyle='#68746f';x.font='24px Arial';x.textAlign='center';x.fillText('נוצר בכרטיס הקשר של הגן',540,1285);const a=document.createElement('a');a.download=`כרטיס קשר - ${name}.png`;a.href=c.toDataURL('image/png');a.click()};
+  </script>
+</body>
+</html>
